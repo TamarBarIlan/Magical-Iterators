@@ -13,6 +13,7 @@ namespace ariel
 
     private:
         std::vector<int> elements;
+        std::vector<int> primeElements;
 
     public:
         MagicalContainer() = default;
@@ -21,11 +22,13 @@ namespace ariel
 
         MagicalContainer &operator=(MagicalContainer &other);
         std::vector<int> &getElements();
+        std::vector<int> &getPrimeElements();
         void addElement(int element);
         void removeElement(int element);
         int size();
         bool operator==(MagicalContainer &other);
         int at(int index);
+        bool isPrime(int number);
 
         class AscendingIterator
         {
@@ -99,7 +102,7 @@ namespace ariel
             int index;
 
         public:
-            SideCrossIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            // SideCrossIterator() : mContainer(*(new MagicalContainer)), index(0) {}
             SideCrossIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
             SideCrossIterator(SideCrossIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~SideCrossIterator() = default;
@@ -146,6 +149,7 @@ namespace ariel
                 if (index == end)
                 {
                     throw std::runtime_error("index out of bounds");
+                    // return this->end();
                 }
                 if (index < end)
                 {
@@ -157,14 +161,14 @@ namespace ariel
                 }
                 return *this;
             }
-            SideCrossIterator begin()
+            SideCrossIterator &begin()
             {
                 index = 0;
                 return *this;
             }
-            SideCrossIterator end()
+            SideCrossIterator &end()
             {
-                std::cout <<"end == " <<mContainer.getElements().size() / 2 << std::endl;
+                std::cout <<"in end() index == " << std::ceil(mContainer.getElements().size() / 2) << std::endl;
                 index = std::ceil(mContainer.getElements().size() / 2);
                 return *this;
             }
@@ -178,7 +182,7 @@ namespace ariel
             int index;
 
         public:
-            PrimeIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            // PrimeIterator() : mContainer(*(new MagicalContainer)), index(0) {}
             PrimeIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
             PrimeIterator(PrimeIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~PrimeIterator() = default;
@@ -205,17 +209,17 @@ namespace ariel
             }
             bool operator<(PrimeIterator &iter)
             {
-                return false;
+                return index < iter.index;
             }
             bool operator>(PrimeIterator &iter)
             {
-                return false;
+                return index > iter.index;
             }
 
             // dereference operator
             int &operator*()
             {
-                return mContainer.getElements()[static_cast<std::vector<int>::size_type>(index)];
+                return mContainer.getPrimeElements()[static_cast<std::vector<int>::size_type>(index)];
             }
 
             // pre-increment operator
@@ -231,7 +235,7 @@ namespace ariel
             }
             PrimeIterator &end()
             {
-                index = mContainer.getElements().size();
+                index = mContainer.getPrimeElements().size();
                 return *this;
             }
 
