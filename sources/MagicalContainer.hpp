@@ -44,6 +44,10 @@ namespace ariel
             // assignment operator
             AscendingIterator &operator=(AscendingIterator &iter)
             {
+                if(this->mContainer != iter.mContainer)
+                {
+                    throw std::runtime_error("different containers");
+                }
                 if (this != &iter)
                 {
                     mContainer = iter.mContainer;
@@ -110,6 +114,10 @@ namespace ariel
             // assignment operator
             SideCrossIterator &operator=(SideCrossIterator &iter)
             {
+                if(this->mContainer != iter.mContainer)
+                {
+                    throw std::runtime_error("different containers");
+                }
                 if (this != &iter)
                 {
                     mContainer = iter.mContainer;
@@ -190,6 +198,10 @@ namespace ariel
             // assignment operator
             PrimeIterator &operator=(PrimeIterator &iter)
             {
+                if(this->mContainer != iter.mContainer)
+                {
+                    throw std::runtime_error("different containers");
+                }
                 if (this != &iter)
                 {
                     mContainer = iter.mContainer;
