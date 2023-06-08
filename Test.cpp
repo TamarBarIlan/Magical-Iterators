@@ -59,9 +59,10 @@ TEST_CASE("MagicalContainer SideCrossIterator - Cross order")
     container.addElement(25);
     container.addElement(9);
     container.addElement(3);
+
     MagicalContainer::SideCrossIterator crossIter(container);
 
-    std::vector<int> cross = {17, 3, 2, 9, 25};
+    std::vector<int> cross = {2, 25, 3, 17, 9};
     std::vector<int>::size_type index = 0;
     for (auto it = crossIter.begin(); it != crossIter.end(); ++it)
     {
@@ -82,7 +83,7 @@ TEST_CASE("MagicalContainer SideCrossIterator - Remove element")
 
     MagicalContainer::SideCrossIterator crossIter(container);
 
-    std::vector<int> cross = {17, 3, 2, 25};
+    std::vector<int> cross = {2, 25, 3, 17};
     std::vector<int>::size_type index = 0;
     for (auto it = crossIter.begin(); it != crossIter.end(); ++it)
     {
