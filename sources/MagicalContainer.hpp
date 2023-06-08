@@ -42,14 +42,13 @@ namespace ariel
             AscendingIterator(const AscendingIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~AscendingIterator() = default;
 
-            // assignment operator
-            AscendingIterator &operator=(AscendingIterator &&iter) noexcept
+            AscendingIterator &operator=(const AscendingIterator &iter)
             {
-                if (this != &iter)
+                if (&mContainer != &iter.mContainer)
                 {
-                    this->mContainer = std::move(iter.mContainer);
-                    this->index = iter.index;
+                    throw std::runtime_error("Iterators are pointing to different containers.");
                 }
+                index = iter.index;
                 return *this;
             }
 
@@ -117,6 +116,9 @@ namespace ariel
 
         }; // AscendingIterator
 
+        // ***************************************//
+        // SideCrossIterator                     //
+        // ***************************************//
         class SideCrossIterator
         {
         private:
@@ -124,18 +126,20 @@ namespace ariel
             int index;
 
         public:
-            SideCrossIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            SideCrossIterator() = delete;
             SideCrossIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
-            SideCrossIterator(SideCrossIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
+            SideCrossIterator(const SideCrossIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~SideCrossIterator() = default;
 
-            // assignment operator
-            SideCrossIterator &operator=(SideCrossIterator &iter)
+            SideCrossIterator &operator=(const SideCrossIterator &iter)
             {
+                if (&mContainer != &iter.mContainer)
+                {
+                    throw std::runtime_error("You try to pointing at different containers");
+                }
                 if (this != &iter)
                 {
-                    mContainer = iter.mContainer;
-                    index = iter.index;
+                    this->index = iter.index;
                 }
                 return *this;
             }
@@ -143,47 +147,87 @@ namespace ariel
             // comparison operators
             bool operator==(SideCrossIterator &iter)
             {
-                // return this->mContainer == iter.mContainer && this->index == iter.index;
-                return true;
+                if (typeid(*this) != typeid(iter))
+                {
+                    throw std::runtime_error("Compare different types of iterators ");
+                }
+
+                return this->index == iter.index;
             }
+
+            //	Inequality comparison
             bool operator!=(SideCrossIterator &iter)
             {
                 return !(this->index == iter.index);
             }
-            bool operator<(SideCrossIterator &iter)
+
+            // GT comparison
+            bool operator<(const SideCrossIterator &iter) const
             {
-                return false;
+                return index < iter.index;
             }
-            bool operator>(SideCrossIterator &iter)
+
+            // LT comparison
+            bool operator>(const SideCrossIterator &iter) const
             {
-                return false;
+                return index > iter.index;
             }
 
             // dereference operator
             int &operator*()
             {
+                if (index >= mContainer.getElements().size())
+                {
+                    throw std::runtime_error("Out of bounds");
+                }
                 return mContainer.getElements()[static_cast<std::vector<int>::size_type>(index)];
             }
 
             // pre-increment operator
             SideCrossIterator &operator++()
             {
-                index++;
+                if (index == mContainer.size())
+                {
+                    throw std::runtime_error("You are in the last element");
+                }
+                if (index == (mContainer.size() / 2))
+                {
+                    index = mContainer.size();
+                    return *this;
+                }
+
+                if (index < (mContainer.size() / 2))
+                {
+                    index = mContainer.size() - index - 1;
+                    return *this;
+                }
+
+                else if (index > (mContainer.size() / 2))
+                {
+                    index = mContainer.size() - index;
+                    return *this;
+                }
+
                 return *this;
             }
+
             SideCrossIterator &begin()
             {
                 index = 0;
                 return *this;
             }
+
             SideCrossIterator &end()
             {
-                index = mContainer.getElements().size();
+                index = mContainer.size();
                 return *this;
             }
 
         }; // SideCrossIterator
 
+        // ***************************************//
+        // PrimeIterator                      //
+        // ***************************************//
         class PrimeIterator
         {
         private:
@@ -191,62 +235,80 @@ namespace ariel
             int index;
 
         public:
-            PrimeIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            PrimeIterator() = delete;
             PrimeIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
-            PrimeIterator(PrimeIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
+            PrimeIterator(const PrimeIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~PrimeIterator() = default;
 
-            // assignment operator
-            PrimeIterator &operator=(PrimeIterator &iter)
+            PrimeIterator &operator=(const PrimeIterator &iter)
             {
-                if (this != &iter)
+                if (&mContainer != &iter.mContainer)
                 {
-                    mContainer = iter.mContainer;
-                    index = iter.index;
+                    throw std::runtime_error("Iterators are pointing to different containers.");
                 }
+                index = iter.index;
                 return *this;
             }
 
             // comparison operators
             bool operator==(PrimeIterator &iter)
             {
-                return true;
+                if (typeid(*this) != typeid(iter))
+                {
+                    throw std::runtime_error("Compare different types of iterators ");
+                }
 
-                // return this->mContainer == iter.mContainer && this->index == iter.index;
+                return this->index == iter.index;
             }
+
+            //	Inequality comparison
             bool operator!=(PrimeIterator &iter)
             {
                 return !(this->index == iter.index);
             }
-            bool operator<(PrimeIterator &iter)
+
+            // GT comparison
+            bool operator<(const PrimeIterator &iter) const
             {
-                return false;
+                return index < iter.index;
             }
-            bool operator>(PrimeIterator &iter)
+
+            // LT comparison
+            bool operator>(const PrimeIterator &iter) const
             {
-                return false;
+                return index > iter.index;
             }
 
             // dereference operator
             int &operator*()
             {
-                return mContainer.getElements()[static_cast<std::vector<int>::size_type>(index)];
+                if (index >= mContainer.getElements().size())
+                {
+                    throw std::runtime_error("Out of bounds");
+                }
+                return *mContainer.getPrimeElements()[static_cast<std::vector<int>::size_type>(index)];
             }
 
             // pre-increment operator
             PrimeIterator &operator++()
             {
-                index++;
+                if (index >= mContainer.getPrimeElements().size())
+                {
+                    throw std::runtime_error("You are in the last element");
+                }
+                ++index;
                 return *this;
             }
+
             PrimeIterator &begin()
             {
                 index = 0;
                 return *this;
             }
+
             PrimeIterator &end()
             {
-                index = mContainer.getElements().size();
+                index = mContainer.getPrimeElements().size();
                 return *this;
             }
 

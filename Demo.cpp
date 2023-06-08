@@ -1,5 +1,6 @@
 #include <iostream>
 #include "sources/MagicalContainer.hpp"
+
 using namespace ariel;
 int main() {
     // Create a MagicalContainer and add some elements
@@ -10,24 +11,13 @@ int main() {
     container.addElement(9);
     container.addElement(3);
 
-
     // Print container size
     std::cout << "Size of container: " << container.size() << std::endl;
 
     // Use AscendingIterator to display elements in ascending order
     std::cout << "Elements in ascending order:\n";
     MagicalContainer::AscendingIterator ascIter(container);
-    std::cout << "after ascIter\n"<< std::endl;
-    auto it = ascIter.begin();
-    std::cout << "after ascIter.begin();\n"<< std::endl;
-    ascIter.end();
-    std::cout << "after ascIter.end();\n"<< std::endl;
-    if(it != ascIter.end()){}
-    std::cout << "after vit != ascIter.end();;\n"<< std::endl;
-     ++it;
-    std::cout << "after ++it;;\n"<< std::endl;
     for (auto it = ascIter.begin(); it != ascIter.end(); ++it) {
-        std::cout << "in for" << std::endl;
         std::cout << *it << ' ';   // 2 3 9 17 25
     }
     std::cout << std::endl;
