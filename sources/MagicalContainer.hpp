@@ -12,7 +12,7 @@ namespace ariel
 
     private:
         std::vector<int> elements;
-        std::vector<int*> primeElements;
+        std::vector<int *> primeElements;
 
     public:
         MagicalContainer() = default;
@@ -22,11 +22,14 @@ namespace ariel
         void addElement(int element);
         void removeElement(int element);
         int size() const;
-        void setElements(std::vector<int>& elements);
-        std::vector<int>& getElements();
-        std::vector<int*>& getPrimeElements();
+        void setElements(std::vector<int> &elements);
+        std::vector<int> &getElements();
+        std::vector<int *> &getPrimeElements();
         bool isPrime(int);
 
+        // ***************************************//
+        // AscendingIterator                      //
+        // ***************************************//
         class AscendingIterator
         {
         private:
@@ -34,18 +37,18 @@ namespace ariel
             int index;
 
         public:
-            AscendingIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            AscendingIterator() = delete;
             AscendingIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
-            AscendingIterator(AscendingIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
+            AscendingIterator(const AscendingIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~AscendingIterator() = default;
 
             // assignment operator
-            AscendingIterator &operator=(AscendingIterator &iter)
+            AscendingIterator &operator=(AscendingIterator &&iter) noexcept
             {
                 if (this != &iter)
                 {
-                    mContainer = iter.mContainer;
-                    index = iter.index;
+                    this->mContainer = std::move(iter.mContainer);
+                    this->index = iter.index;
                 }
                 return *this;
             }
@@ -53,38 +56,59 @@ namespace ariel
             // comparison operators
             bool operator==(AscendingIterator &iter)
             {
-                return this->mContainer == iter.mContainer && this->index == iter.index;
+                if (typeid(*this) != typeid(iter))
+                {
+                    throw std::runtime_error("Compare different types of iterators ");
+                }
+
+                return this->index == iter.index;
             }
+
+            //	Inequality comparison
             bool operator!=(AscendingIterator &iter)
             {
                 return !(this->index == iter.index);
             }
+
+            // GT comparison
             bool operator<(const AscendingIterator &iter) const
             {
-                return false;
+                return index < iter.index;
             }
+
+            // LT comparison
             bool operator>(const AscendingIterator &iter) const
             {
-                return false;
+                return index > iter.index;
             }
 
             // dereference operator
             int &operator*()
             {
+                if (index >= mContainer.getElements().size())
+                {
+                    throw std::runtime_error("Out of bounds");
+                }
                 return mContainer.getElements()[static_cast<std::vector<int>::size_type>(index)];
             }
 
             // pre-increment operator
             AscendingIterator &operator++()
             {
-                index++;
+                if (index >= mContainer.getElements().size())
+                {
+                    throw std::runtime_error("You are in the last element");
+                }
+                ++index;
                 return *this;
             }
+
             AscendingIterator &begin()
             {
                 index = 0;
                 return *this;
             }
+
             AscendingIterator &end()
             {
                 index = mContainer.getElements().size();
@@ -119,7 +143,8 @@ namespace ariel
             // comparison operators
             bool operator==(SideCrossIterator &iter)
             {
-                return this->mContainer == iter.mContainer && this->index == iter.index;
+                // return this->mContainer == iter.mContainer && this->index == iter.index;
+                return true;
             }
             bool operator!=(SideCrossIterator &iter)
             {
@@ -185,7 +210,9 @@ namespace ariel
             // comparison operators
             bool operator==(PrimeIterator &iter)
             {
-                return this->mContainer == iter.mContainer && this->index == iter.index;
+                return true;
+
+                // return this->mContainer == iter.mContainer && this->index == iter.index;
             }
             bool operator!=(PrimeIterator &iter)
             {
