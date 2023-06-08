@@ -2,38 +2,29 @@
 using namespace std;
 using namespace ariel;
 
-MagicalContainer::MagicalContainer(MagicalContainer &other) : elements(other.elements), primeElements(other.primeElements) {}
+MagicalContainer::MagicalContainer(const MagicalContainer &other) : elements(other.elements), primeElements(other.primeElements) {}
 
-MagicalContainer &MagicalContainer::operator=(MagicalContainer &other)
+MagicalContainer::~MagicalContainer()
 {
-    if (&other != this)
+    for (int *element : primeElements)
     {
-        elements = other.elements;
-        primeElements = other.primeElements;
+        delete element;
     }
-    return *this;
-}
-
-std::vector<int> &MagicalContainer::getElements()
-{
-    return this->elements;
-}
-std::vector<int> &MagicalContainer::getPrimeElements() 
-{
-    return this->primeElements;
 }
 
 void MagicalContainer::addElement(int element)
 {
     if (isPrime(element))
     {
-        auto spacePrime = std::upper_bound(this->primeElements.begin(), this->primeElements.end(), element);
-        this->primeElements.insert(spacePrime, element);
+        int* find_element = new int(element);
+        auto spacePrime = std::lower_bound(primeElements.begin(), primeElements.end(), find_element, [](const int *x,const int *y) { return ((*x) < (*y)); });
+        getPrimeElements().insert(spacePrime, find_element);
     }
-    auto space = std::upper_bound(this->elements.begin(), this->elements.end(), element);
+    auto space = std::lower_bound(this->elements.begin(), this->elements.end(), element);
     this->elements.insert(space, element);
 }
-void MagicalContainer::removeElement(int element)
+
+void MagicalContainer ::removeElement(int element)
 {
     auto it = std::find(elements.begin(), elements.end(), element);
     if (it != elements.end())
@@ -44,36 +35,44 @@ void MagicalContainer::removeElement(int element)
     {
         throw runtime_error("Removing a non-existing element");
     }
+    if(isPrime(element)){ 
+        int* PrimeElement= new int(element);
+        auto it = std::find(primeElements.begin(), primeElements.end(), PrimeElement);
+        primeElements.erase(it);
+        delete PrimeElement;
+    }
 }
-int MagicalContainer::size()
+
+int MagicalContainer:: size() const
 {
     return this->elements.size();
 }
 
-bool MagicalContainer::operator==(MagicalContainer &other)
+std::vector<int>& MagicalContainer:: getElements()
 {
-    return this->elements == other.elements;
+    return this->elements;
 }
-int MagicalContainer::at(int index)
+std::vector<int*>& MagicalContainer:: getPrimeElements()
 {
-    if (index < 0)
-    {
-        __throw_out_of_range("Index cannot be negative.");
+    return this->primeElements;
+}
+
+bool MagicalContainer::isPrime(int num)
+{
+    if (num <= 1) {
+        return false;
     }
-    return elements.at(static_cast<std::vector<int>::size_type>(index));
-}
-bool MagicalContainer::isPrime(int number)
-{
-    if (number <= 1)
-        return false;
-    if (number == 2)
+    if (num == 2) {
         return true;
-    if (number % 2 == 0)
+    }
+    if (num % 2 == 0) {
         return false;
-    for (int i = 3; (i * i) <= number; i += 2)
-    {
-        if (number % i == 0)
+    }
+    for (int i = 3; i <= std::sqrt(num); i += 2) {
+        if (num % i == 0) {
             return false;
+        }
     }
     return true;
 }
+

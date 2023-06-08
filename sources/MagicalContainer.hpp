@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include <string>
 #include <cmath>
 
 namespace ariel
@@ -13,22 +12,20 @@ namespace ariel
 
     private:
         std::vector<int> elements;
-        std::vector<int> primeElements;
+        std::vector<int*> primeElements;
 
     public:
         MagicalContainer() = default;
-        MagicalContainer(MagicalContainer &other);
-        ~MagicalContainer() = default;
+        MagicalContainer(const MagicalContainer &other);
+        ~MagicalContainer();
 
-        MagicalContainer &operator=(MagicalContainer &other);
-        std::vector<int> &getElements();
-        std::vector<int> &getPrimeElements();
         void addElement(int element);
         void removeElement(int element);
-        int size();
-        bool operator==(MagicalContainer &other);
-        int at(int index);
-        bool isPrime(int number);
+        int size() const;
+        void setElements(std::vector<int>& elements);
+        std::vector<int>& getElements();
+        std::vector<int*>& getPrimeElements();
+        bool isPrime(int);
 
         class AscendingIterator
         {
@@ -37,6 +34,7 @@ namespace ariel
             int index;
 
         public:
+            AscendingIterator() : mContainer(*(new MagicalContainer)), index(0) {}
             AscendingIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
             AscendingIterator(AscendingIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~AscendingIterator() = default;
@@ -44,10 +42,6 @@ namespace ariel
             // assignment operator
             AscendingIterator &operator=(AscendingIterator &iter)
             {
-                if(this->mContainer != iter.mContainer)
-                {
-                    throw std::runtime_error("different containers");
-                }
                 if (this != &iter)
                 {
                     mContainer = iter.mContainer;
@@ -67,11 +61,11 @@ namespace ariel
             }
             bool operator<(const AscendingIterator &iter) const
             {
-                return &index < &iter.index;
+                return false;
             }
             bool operator>(const AscendingIterator &iter) const
             {
-                return &index > &iter.index;
+                return false;
             }
 
             // dereference operator
@@ -106,7 +100,7 @@ namespace ariel
             int index;
 
         public:
-            // SideCrossIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            SideCrossIterator() : mContainer(*(new MagicalContainer)), index(0) {}
             SideCrossIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
             SideCrossIterator(SideCrossIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~SideCrossIterator() = default;
@@ -114,10 +108,6 @@ namespace ariel
             // assignment operator
             SideCrossIterator &operator=(SideCrossIterator &iter)
             {
-                if(this->mContainer != iter.mContainer)
-                {
-                    throw std::runtime_error("different containers");
-                }
                 if (this != &iter)
                 {
                     mContainer = iter.mContainer;
@@ -137,11 +127,11 @@ namespace ariel
             }
             bool operator<(SideCrossIterator &iter)
             {
-                return &index < &iter.index;
+                return false;
             }
             bool operator>(SideCrossIterator &iter)
             {
-                return &index > &iter.index;
+                return false;
             }
 
             // dereference operator
@@ -153,20 +143,7 @@ namespace ariel
             // pre-increment operator
             SideCrossIterator &operator++()
             {
-                int end = this->end().index;
-                if (index == end)
-                {
-                    throw std::runtime_error("index out of bounds");
-                    // return this->end();
-                }
-                if (index < end)
-                {
-                    index = (int)mContainer.getElements().size() - index - 1;
-                }
-                else if (index > end)
-                {
-                    index = (int)mContainer.getElements().size() - index;
-                }
+                index++;
                 return *this;
             }
             SideCrossIterator &begin()
@@ -176,8 +153,7 @@ namespace ariel
             }
             SideCrossIterator &end()
             {
-                std::cout <<"in end() index == " << std::ceil(mContainer.getElements().size() / 2) << std::endl;
-                index = std::ceil(mContainer.getElements().size() / 2);
+                index = mContainer.getElements().size();
                 return *this;
             }
 
@@ -190,7 +166,7 @@ namespace ariel
             int index;
 
         public:
-            // PrimeIterator() : mContainer(*(new MagicalContainer)), index(0) {}
+            PrimeIterator() : mContainer(*(new MagicalContainer)), index(0) {}
             PrimeIterator(MagicalContainer &mContainer) : mContainer(mContainer), index(0) {}
             PrimeIterator(PrimeIterator &iter) : mContainer(iter.mContainer), index(iter.index) {}
             ~PrimeIterator() = default;
@@ -198,10 +174,6 @@ namespace ariel
             // assignment operator
             PrimeIterator &operator=(PrimeIterator &iter)
             {
-                if(this->mContainer != iter.mContainer)
-                {
-                    throw std::runtime_error("different containers");
-                }
                 if (this != &iter)
                 {
                     mContainer = iter.mContainer;
@@ -221,17 +193,17 @@ namespace ariel
             }
             bool operator<(PrimeIterator &iter)
             {
-                return index < iter.index;
+                return false;
             }
             bool operator>(PrimeIterator &iter)
             {
-                return index > iter.index;
+                return false;
             }
 
             // dereference operator
             int &operator*()
             {
-                return mContainer.getPrimeElements()[static_cast<std::vector<int>::size_type>(index)];
+                return mContainer.getElements()[static_cast<std::vector<int>::size_type>(index)];
             }
 
             // pre-increment operator
@@ -247,7 +219,7 @@ namespace ariel
             }
             PrimeIterator &end()
             {
-                index = mContainer.getPrimeElements().size();
+                index = mContainer.getElements().size();
                 return *this;
             }
 
